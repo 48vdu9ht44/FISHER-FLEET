@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Fisher Fleet — Ocean’s Finest</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --navy:#0a1224;
+      --deep:#081020;
+      --ink:#0e1a36;
+      --line:#1d2b52;
+      --gold:#f5cc58;
+      --gold-2:#ffef9a;
+      --text:#f5f8ff;
+      --muted:#a7b4d4;
+      --danger:#e45b5b;
+      --radius:20px;
+      --shadow:0 14px 40px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+      font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 5% -10%, #132857 0%, transparent 60%),
+        radial-gradient(1000px 700px at 105% 0%, #10234b 0%, transparent 60%),
+        linear-gradient(180deg, var(--navy), #0a1429 60%, var(--deep));
+      overflow-x:hidden;
+      line-height:1.5;
+    }
+    .topbar{
+      background:linear-gradient(90deg, #0f234a, #0b1a37);
+      color:var(--gold-2);
+      font-weight:600;
+      font-size:.9rem;
+      text-align:center;
+      padding:.55rem .75rem;
+      border-bottom:1px solid #22335f;
+    }
+    header{
+      position:sticky;
+      top:0;
+      z-index:50;
+      backdrop-filter: blur(8px);
+      background:rgba(8,16,32,.6);
+      border-bottom:1px solid #1a2a52;
+    }
+    .nav{
+      max-width:1200px;
+      margin:0 auto;
+      padding:.75rem 1rem;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .brand{
+      display:flex;align-items:center;gap:1.1rem;text-decoration:none;
+    }
+    .brand img{width:48px;height:48px;border-radius:50%;background:#fff;box-shadow:inset 0 2px 18px rgba(0,0,0,.06)}
+    .brand span{font-family: 'Pacifico', cursive;font-size:2.1rem;color:var(--gold);letter-spacing:1px;text-shadow:0 6px 22px #0004;}
+    /* MENU */
+    .menu{display:flex;align-items:center;gap:16px;position:relative;}
+    .menu a{color:var(--muted);text-decoration:none;font-weight:600;padding:8px 10px;border-radius:12px;transition:.25s}
+    .menu a:hover{color:var(--text);background:#0d1a36;border:1px solid #26396b;}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:12px 18px;border-radius:999px;text-decoration:none;font-weight:700;transition:.25s;border:1px solid #2a3e70;color:var(--text);background:linear-gradient(120deg,#132a54,#0f2144);box-shadow: var(--shadow);}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 24px 54px rgba(0,0,0,.45)}
+    .btn.gold{color:#06131f;background:linear-gradient(120deg,var(--gold),#ffe89a);border-color:#b49537}
+    .btn.gold:hover{box-shadow:0 18px 46px rgba(245,204,88,.35)}
+    /* HAMBURGER */
+    .hamburger{display:none;flex-direction:column;gap:5px;width:24px;cursor:pointer;}
+    .hamburger span{height:3px;background:var(--gold);border-radius:2px;}
+    @media(max-width:880px){
+      .menu{
+        position:absolute;
+        top:100%;
+        right:0;
+        background:#0b152c;
+        border:1px solid var(--line);
+        flex-direction:column;
+        align-items:flex-start;
+        gap:0;
+        display:none;
+        width:220px;
+        box-shadow:var(--shadow);
+      }
+      .menu.show{display:flex}
+      .menu a,.menu .btn{width:100%;padding:12px 16px;border-radius:0}
+      .hamburger{display:flex}
+    }
+    /* USER ICON & DROPDOWN */
+    .user-icon{
+      cursor:pointer;
+      fill:var(--gold);
+      width:28px;
+      height:28px;
+      margin-left:8px;
+      flex-shrink:0;
+    }
+    .user-menu{
+      position:absolute;
+      right:1rem;
+      top:60px;
+      background:#0f1d3a;
+      border:1px solid var(--line);
+      border-radius:12px;
+      box-shadow:var(--shadow);
+      padding:10px;
+      display:none;
+      flex-direction:column;
+      z-index:100;
+      min-width:130px;
+    }
+    .user-menu a{
+      color:var(--muted);
+      padding:8px 12px;
+      text-decoration:none;
+      border-radius:8px;
+      font-weight:600;
+      font-size:0.9rem;
+    }
+    .user-menu a:hover{
+      background:#132a54;
+      color:var(--text);
+    }
+    /* MODAL */
+    .modal{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.6);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:200;
+    }
+    .modal-content{
+      background:#0f1d3a;
+      padding:20px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      max-width:400px;
+      width:90%;
+      box-shadow:var(--shadow);
+    }
+    .modal h3{
+      margin:0 0 12px;
+      color:var(--gold);
+      font-weight:700;
+      font-size:1.4rem;
+      text-align:center;
+    }
+    .modal input{
+      width:100%;
+      padding:12px;
+      border-radius:10px;
+      background:#0b1832;
+      color:var(--text);
+      border:1px solid #24386f;
+      margin-bottom:12px;
+      font-size:1rem;
+      outline:none;
+      transition:border-color .25s ease, box-shadow .25s ease;
+    }
+    .modal input:focus{
+      border-color:var(--gold);
+      box-shadow:0 0 0 3px rgba(245,204,88,.15);
+    }
+    .modal button{
+      margin-top:6px;
+      width:100%;
+      border:none;
+      padding:12px;
+      border-radius:999px;
+      font-weight:700;
+      background:linear-gradient(120deg,var(--gold),#ffe89a);
+      color:#06131f;
+      cursor:pointer;
+      box-shadow:0 18px 46px rgba(245,204,88,.35);
+      transition:background .25s ease, box-shadow .25s ease;
+    }
+    .modal button:hover{
+      box-shadow:0 24px 54px rgba(245,204,88,.6);
+      background:#f5cc58;
+    }
+    /* HERO, CARDS etc */
+    .hero{
+      position:relative;
+    }
+    .hero-wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:46px 16px 30px;
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:28px;
+      align-items:center;
+    }
+    .hero h1{
+      font-size:clamp(1.8rem,1.2rem+2vw,3rem);
+      margin:0 0 10px;
+      text-shadow: 0 8px 30px #0006;
+      line-height:1.2;
+    }
+    .hero p{
+      color:var(--muted);
+      margin:0 0 18px;
+      max-width:640px;
+      line-height:1.7;
+    }
+    .cta-row{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .hero-visual{
+      position:relative;
+      min-height:300px;
+      border-radius:24px;
+      overflow:hidden;
+      border:1px solid #1a2a52;
+      box-shadow:var(--shadow);
+      background:
+        radial-gradient(140px 140px at 85% 15%, rgba(255,255,255,.08), transparent 60%),
+        radial-gradient(160px 160px at 0% 100%, rgba(255,240,150,.14), transparent 70%),
+        linear-gradient(180deg, #0f1d3a, #0a1427);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .slide-img{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      opacity:0;
+      z-index:0;
+      transition:opacity 0.9s cubic-bezier(.4,0,.2,1);
+      border-radius:24px;
+    }
+    .slide-active{
+      opacity:1 !important;
+      z-index:1;
+    }
+    @media(max-width:980px){
+      .hero-wrap{
+        grid-template-columns:1fr;
+        text-align:center;
+      }
+      .hero-visual{
+        margin-top:20px;
+      }
+    }
+    .section{
+      padding:32px 0 6px;
+    }
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:0 16px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:16px;
+      margin-top:12px;
+    }
+    .card{
+      background:linear-gradient(180deg,#0d1a36,#0b152c);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+      transform: translateY(8px);
+      opacity:0;
+    }
+    .card.reveal{
+      transform:none;
+      opacity:1;
+      transition: transform .6s ease, opacity .6s ease, box-shadow .25s ease;
+    }
+    .thumb{
+      aspect-ratio:4/3;
+      overflow:hidden;
+      position:relative;
+    }
+    .thumb img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      transform:scale(1.04);
+      transition:transform .35s ease;
+    }
+    .card:hover .thumb img{
+      transform:scale(1.09);
+    }
+    .card:hover{
+      box-shadow:0 26px 60px rgba(0,0,0,.45);
+      border-color:#334a82;
+    }
+    .meta{
+      padding:12px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .title{
+      font-weight:700;
+    }
+    .chip{
+      font-size:.78rem;
+      font-weight:700;
+      color:#0c141f;
+      padding:6px 10px;
+      border-radius:999px;
+      background:linear-gradient(120deg,var(--gold),#fff1a6);
+    }
+    .why{
+      display:grid;
+      grid-template-columns: .95fr 1.05fr;
+      gap:28px;
+      align-items:start;
+      margin-top:18px;
+    }
+    .why .photo{
+      background:#0d1a36;
+      border:1px solid var(--line);
+      border-radius:22px;
+      overflow:hidden;
+      box-shadow:var(--shadow);
+    }
+    .why .photo img{
+      width:100%;
+      height:100%;
+      display:block;
+      object-fit:contain;
+    }
+    .feat{
+      display:grid;
+      gap:16px;
+    }
+    .point{
+      display:grid;
+      grid-template-columns:40px 1fr;
+      gap:12px;
+      align-items:start;
+      padding:12px 12px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:linear-gradient(180deg,#0f1d3a,#0b152c);
+    }
+    .point svg{
+      width:28px;
+      height:28px;
+    }
+    .point h4{
+      margin:0 0 6px;
+      font-size:1rem;
+    }
+    .point p{
+      margin:0;
+      color:var(--muted);
+    }
+    .about{
+      margin-top:28px;
+      background:linear-gradient(180deg,#0a1327,#0b152c);
+      border-top:1px solid #24386f;
+      border-bottom:1px solid #24386f;
+      position:relative;
+      isolation:isolate;
+    }
+    .about::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(300px 200px at 10% 15%, rgba(245,204,88,.18), transparent 70%),
+        radial-gradient(300px 200px at 95% 80%, rgba(255,255,255,.06), transparent 70%);
+      opacity:.7;
+    }
+    .about-grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:28px;
+      align-items:center;
+    }
+    .about img{
+      width:100%;
+      border-radius:18px;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+    }
+    .about h3{
+      margin:0 0 10px;
+      font-size:clamp(1.2rem,1rem+1vw,1.8rem);
+      color:var(--gold);
+    }
+    .about p{
+      margin:0 0 12px;
+      color:var(--muted);
+    }
+    .contact{
+      margin-top:28px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:24px;
+    }
+    .card-lite{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:linear-gradient(180deg,#0f1d3a,#0b152c);
+      padding:16px;
+      box-shadow:var(--shadow);
+    }
+    .form input,.form textarea{
+      width:100%;
+      padding:12px 14px;
+      border-radius:12px;
+      background:#0b1832;
+      color:var(--text);
+      border:1px solid #24386f;
+      margin-bottom:10px;
+      outline:none;
+      transition:border-color .25s ease, box-shadow .25s ease;
+      font-size:1rem;
+    }
+    .form input:focus,.form textarea:focus{
+      border-color: var(--gold);
+      box-shadow:0 0 0 3px rgba(245,204,88,.15);
+    }
+    .form button{
+      width:fit-content;
+    }
+    footer{
+      margin-top:34px;
+      border-top:1px solid #22335f;
+      color:#89a0c8;
+      text-align:center;
+      padding:20px 14px 32px;
+    }
+    @media (max-width: 980px){
+      .hero-wrap{ grid-template-columns: 1fr; text-align:center; }
+      .why{ grid-template-columns: 1fr; }
+      .about-grid{ grid-template-columns: 1fr; }
+      .contact{ grid-template-columns: 1fr; }
+      .hero-visual img{ position:relative; width:100%; }
+    }
+    .pulse-gold{ animation: pulse 3.3s ease-in-out infinite }
+    @keyframes pulse{
+      0%,100{ filter: drop-shadow(0 0 0 rgba(245,204,88,0)) }
+      50%{ filter: drop-shadow(0 0 18px rgba(245,204,88,.45)) }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">Free island-wide delivery • Fresh daily, quality assured</div>
+  <!-- HEADER with logo and Fisher Fleet cursive Pacifico font name -->
+  <header>
+    <nav class="nav" aria-label="Main Navigation">
+      <a class="brand" href="index.html" aria-label="Fisher Fleet Home">
+        <img src="ong.png" alt="Fisher Fleet Logo" class="pulse-gold">
+        <span>Fisher Fleet</span>
+      </a>
+      <div class="hamburger" id="hamburger" aria-label="Toggle menu" role="button" tabindex="0">
+        <span></span><span></span><span></span>
+      </div>
+      <div class="menu" id="menu">
+        <a href="#about">About Us</a>
+        <a href="crabs.html">Crabs</a>
+        <a href="lobsters.html">Lobsters</a>
+        <a href="clams.html">Clams</a>
+        <a href="#contact">Contact</a>
+        <a class="btn gold" href="order.html">Order Here</a>
+        <svg id="userIcon" class="user-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-label="User Account" role="button" tabindex="0"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg>
+      </div>
+    </nav>
+    <div class="user-menu" id="userMenu" role="menu" aria-label="User account menu">
+      <a href="#" id="loginLink" role="menuitem">Login</a>
+      <a href="#" id="registerLink" role="menuitem">Register</a>
+      <a href="#" role="menuitem">My Account</a>
+      <a href="#" role="menuitem">Logout</a>
+    </div>
+  </header>
+
+  <!-- HERO WITH SLIDESHOW -->
+  <section class="hero" aria-label="Hero section with seafood slides">
+    <div class="hero-wrap">
+      <div>
+        <h1>Affordable, Fresh, and <span style="color:var(--gold)">Royal-Grade</span> Seafood.</h1>
+        <p>We specialize in premium <strong>crabs, lobsters, and clams</strong>. Professionally sourced, quality checked, and delivered with care. Elevate your menu with ocean-fresh selection—without the middleman markup.</p>
+        <div class="cta-row">
+          <a class="btn gold" href="order.html">Order Now</a>
+          <a class="btn" href="#categories">Browse Sections</a>
+        </div>
+      </div>
+      <div class="hero-visual" id="slideshow-hero">
+        <img src="hero1.png" class="slide-img slide-active" alt="Seafood Slide 1">
+        <img src="hero2.png" class="slide-img" alt="Seafood Slide 2">
+        <img src="hero3.png" class="slide-img" alt="Seafood Slide 3">
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPLORE OUR SECTIONS -->
+  <section id="categories" class="section" aria-label="Explore Our Sections">
+    <div class="wrap">
+      <h2>Explore Our Sections</h2>
+      <p>Focused categories for speed and clarity. Click a box to enter the section — we keep specifics exclusive to members and buyers.</p>
+      <div class="grid">
+        <a class="card reveal" href="crabs.html" style="transition-delay:.1s" aria-label="Explore Crabs section">
+          <div class="thumb"><img src="crab.jpg" alt="Crabs"></div>
+          <div class="meta">
+            <div class="title">Crabs</div>
+            <span class="chip">Live • Meaty</span>
+          </div>
+        </a>
+        <a class="card reveal" href="lobsters.html" style="transition-delay:.2s" aria-label="Explore Lobsters section">
+          <div class="thumb"><img src="lobster.jpg" alt="Lobsters"></div>
+          <div class="meta">
+            <div class="title">Lobsters</div>
+            <span class="chip">Prime • Elegant</span>
+          </div>
+        </a>
+        <a class="card reveal" href="clams.html" style="transition-delay:.3s" aria-label="Explore Clams section">
+          <div class="thumb"><img src="clams.jpg" alt="Clams"></div>
+          <div class="meta">
+            <div class="title">Clams</div>
+            <span class="chip">Pristine • Daily</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY CHOOSE US -->
+  <section class="section" aria-label="Why Choose Fisher Fleet">
+    <div class="wrap">
+      <div class="why">
+        <div class="photo">
+          <img src="ong.png" alt="Fisher Fleet Logo">
+        </div>
+        <div>
+          <p style="color:#ffd777; font-weight:700; margin:0 0 6px;">Only the highest quality</p>
+          <h2 style="margin:0 0 12px;">Why Choose Fisher Fleet</h2>
+          <div class="feat">
+            <div class="point" role="article" aria-label="Restaurant-Grade Quality Assurance">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                <circle cx="12" cy="12" r="10" stroke="var(--gold)" stroke-width="2"/>
+                <path d="M7 12l3 3 7-7" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <div>
+                <h4>Restaurant-Grade QA</h4>
+                <p>Strict sizing, texture, and freshness checks. Graded at source and rechecked before dispatch.</p>
+              </div>
+            </div>
+            <div class="point" role="article" aria-label="Flown and Delivered Daily">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                <path d="M3 6h18M3 12h18M3 18h18" stroke="var(--gold)" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <div>
+                <h4>Flown / Delivered Daily</h4>
+                <p>Frequent arrivals from trusted fisheries ensure consistent supply and peak-day freshness.</p>
+              </div>
+            </div>
+            <div class="point" role="article" aria-label="Save Time">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                <path d="M12 8v8M8 12h8" stroke="var(--gold)" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <div>
+                <h4>Save Time</h4>
+                <p>Fast order flow and direct communication. We streamline procurement so your kitchen runs smoother.</p>
+              </div>
+            </div>
+            <div class="point" role="article" aria-label="Transparent and Reasonable Pricing">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                <path d="M4 7h16M4 12h10M4 17h12" stroke="var(--gold)" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <div>
+                <h4>Transparent, Reasonable Pricing</h4>
+                <p>No middleman layers. Premium quality, fair quotes, and clear documentation for every order.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT US -->
+  <section id="about" class="about section" aria-label="About Fisher Fleet">
+    <div class="wrap about-grid">
+      <div>
+        <img src="boat.png" alt="Boat at dock">
+      </div>
+      <div>
+        <h3>About Fisher Fleet</h3>
+        <p>Born from a passion for the sea and a commitment to culinary excellence, Fisher Fleet delivers the ocean’s finest with professional care. Our name stands for discipline, service, and reliability.</p>
+        <p>From live tanks to carefully chilled transport, our process preserves the natural sweetness and texture chefs expect. Whether you’re a home gourmet or a hotel kitchen, we tailor supply to your needs.</p>
+        <div class="cta-row" style="margin-top:10px">
+          <a class="btn gold" href="order.html">Start Your Order</a>
+          <a class="btn" href="#contact">Talk to Our Team</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="section" aria-label="Contact Fisher Fleet">
+    <div class="wrap contact">
+      <div class="card-lite">
+        <h2>Get In Touch</h2>
+        <p style="color:var(--muted); margin-bottom:12px;">Questions, bulk quotes, or special prep? Send us a note and we’ll respond promptly.</p>
+        <form class="form" action="#" method="post" aria-label="Contact form">
+          <input type="text" name="name" placeholder="Your Name" required aria-required="true" aria-label="Your name">
+          <input type="email" name="email" placeholder="Your Email" required aria-required="true" aria-label="Your email">
+          <textarea name="message" rows="5" placeholder="Your Message" required aria-required="true" aria-label="Your message"></textarea>
+          <button class="btn gold" type="submit">Send Message</button>
+        </form>
+      </div>
+      <div class="card-lite" aria-label="Contact Details and Location">
+        <h2>Contact Details</h2>
+        <p>Phone: <strong>+65 6200 8807</strong></p>
+        <p>Email: <strong>sales@fisherfleet.com</strong></p>
+        <p style="color:var(--muted);">Operations: Mon–Sun, 9:00–21:00</p>
+        <div style="height:14px;"></div>
+        <a href="https://share.google/cIOSajBzmOF4hjCvU" target="_blank" rel="noopener" aria-label="View service locations on Google Maps">
+          <img src="map.jpg" alt="Service locations map" style="width:100%; border-radius:12px; border:1px solid var(--line);">
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    © <span id="y"></span> Fisher Fleet • Every Catch Counts
+  </footer>
+
+  <!-- LOGIN/REGISTER MODAL -->
+  <div class="modal" id="authModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-content">
+      <h3 id="modalTitle">Login</h3>
+      <form id="authForm" aria-label="User authentication form">
+        <input type="text" id="usernameField" name="username" placeholder="Username" required aria-required="true" aria-label="Username">
+        <input type="email" id="emailField" name="email" placeholder="Email" required aria-required="true" aria-label="Email">
+        <input type="password" name="password" placeholder="Password" required aria-required="true" aria-label="Password">
+        <button class="btn gold" type="submit">Submit</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // year
+    document.getElementById('y').textContent=new Date().getFullYear();
+
+    // scroll reveal for cards
+    const observer=new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting){
+          e.target.classList.add('reveal');
+          observer.unobserve(e.target);
+        }
+      });
+    },{threshold:.1});
+    document.querySelectorAll('.card').forEach(el=>observer.observe(el));
+
+    // slideshow
+    const slides=document.querySelectorAll('.slide-img');
+    let curr=0;
+    setInterval(() => {
+      slides[curr].classList.remove('slide-active');
+      curr=(curr+1) % slides.length;
+      slides[curr].classList.add('slide-active');
+    }, 3200);
+
+    // hamburger menu toggle
+    const burger=document.getElementById('hamburger');
+    const menu=document.getElementById('menu');
+    burger.addEventListener('click',()=>menu.classList.toggle('show'));
+    burger.addEventListener('keypress',(e)=>{
+      if(e.key==='Enter' || e.key===' '){
+        e.preventDefault();
+        menu.classList.toggle('show');
+      }
+    });
+
+    // user menu toggle
+    const userIcon=document.getElementById('userIcon');
+    const userMenu=document.getElementById('userMenu');
+    userIcon.addEventListener('click',()=>userMenu.style.display=(userMenu.style.display==='flex'?'none':'flex'));
+    userIcon.addEventListener('keypress',(e)=>{
+      if(e.key==='Enter' || e.key===' '){
+        e.preventDefault();
+        userMenu.style.display=(userMenu.style.display==='flex'?'none':'flex');
+      }
+    });
+    document.addEventListener('click',(e)=>{
+      if(!userIcon.contains(e.target) && !userMenu.contains(e.target)){
+        userMenu.style.display='none';
+      }
+    });
+
+    // modal auth form
+    const modal=document.getElementById('authModal');
+    const modalTitle=document.getElementById('modalTitle');
+    const authForm=document.getElementById('authForm');
+    const usernameField=document.getElementById('usernameField');
+    const emailField=document.getElementById('emailField');
+
+    document.getElementById('loginLink').onclick=(e)=>{
+      e.preventDefault();
+      modalTitle.textContent="Login";
+      usernameField.style.display='block';
+      emailField.style.display='block';
+      modal.style.display='flex';
+      modal.setAttribute('aria-hidden','false');
+    };
+
+    document.getElementById('registerLink').onclick=(e)=>{
+      e.preventDefault();
+      modalTitle.textContent="Register";
+      usernameField.style.display='block';
+      emailField.style.display='block';
+      modal.style.display='flex';
+      modal.setAttribute('aria-hidden','false');
+    };
+
+    modal.addEventListener('click',(e)=>{
+      if(e.target===modal){
+        modal.style.display='none';
+        modal.setAttribute('aria-hidden','true');
+      }
+    });
+
+    authForm.addEventListener('submit',(e)=>{
+      e.preventDefault();
+      alert("Form submitted! (Demo only)");
+      modal.style.display='none';
+      modal.setAttribute('aria-hidden','true');
+    });
+  </script>
+</body>
+</html>
